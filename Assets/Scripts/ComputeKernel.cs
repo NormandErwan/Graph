@@ -53,6 +53,11 @@ namespace Graph
             Shader.Dispatch(Id, threadGroupsX, threadGroupsY, threadGroupsZ);
         }
 
+        public int3 GetThreadGroups(int3 workSize)
+        {
+            return (int3)math.ceil(workSize / (float3)ThreadGroupSizes);
+        }
+
         public void SetTexture(int id, Texture texture)
         {
             Shader.SetTexture(Id, id, texture);
