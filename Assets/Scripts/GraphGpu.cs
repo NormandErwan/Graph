@@ -23,12 +23,11 @@ namespace Graph
 
         private static readonly int
             intervalMaxId = Shader.PropertyToID("IntervalMax"),
-            intervalMinId = Shader.PropertyToID("IntervalMin"),
-            textureId = Shader.PropertyToID("Texture");
+            intervalMinId = Shader.PropertyToID("IntervalMin");
 
-        private int graphKernelId;
         private int3 graphKernelGroups;
         private ComputeBuffer positionsBuffer;
+        private ComputeKernel positionsKernel;
         private RenderTexture debugTexture;
 
         private void OnEnable()
@@ -36,16 +35,17 @@ namespace Graph
             int sizeofPosition = 3 * sizeof(float);
             positionsBuffer = new ComputeBuffer(resolution * resolution, sizeofPosition);
 
-            graphKernelId = graphShader.FindKernel("Main");
-            graphShader.GetKernelThreadGroupSizes(graphKernelId, out uint x, out uint y, out uint z);
-            graphKernelGroups = (int3)math.ceil(new float3(resolution, resolution, 1) / new float3(x, y, z));
+            positionsKernel = graphShader.GetKernel("Main");
+
+            int3 positionsWorkSize = new int3(resolution, resolution, 1);
+            graphKernelGroups = positionsKernel.GetThreadGroups(positionsWorkSize);
 
             debugTexture = new RenderTexture(resolution, resolution, 0)
             {
                 enableRandomWrite = true
             };
             debugTexture.Create();
-            graphShader.SetTexture(graphKernelId, textureId, debugTexture);
+            positionsKernel.SetTexture("Texture", debugTexture);
             debugMaterial.mainTexture = debugTexture;
         }
 
@@ -60,7 +60,7 @@ namespace Graph
             graphShader.SetFloat(intervalMinId, positionsInterval.Min);
             graphShader.SetFloat(intervalMaxId, positionsInterval.Max);
 
-            graphShader.Dispatch(graphKernelId, graphKernelGroups.x, graphKernelGroups.y, graphKernelGroups.z);
+            positionsKernel.Dispatch(graphKernelGroups);
         }
     }
 }
