@@ -1,0 +1,18 @@
+﻿#pragma kernel Main
+
+float IntervalMin;
+float IntervalMax;
+
+RWTexture2D<float4> Texture;
+
+float2 GetUv(uint3 id)
+{
+    return IntervalMin + id.xy * IntervalMax;
+}
+
+[numthreads(8, 8, 1)]
+void Main(uint3 id : SV_DispatchThreadID)
+{
+    float2 uv = GetUv(id);
+    Texture[id.xy] = float4(uv.xy, 0, 0);
+}
