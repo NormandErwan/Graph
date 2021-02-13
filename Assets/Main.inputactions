@@ -1,6 +1,45 @@
 {
     "name": "Main",
-    "maps": [],
+    "maps": [
+        {
+            "name": "Player",
+            "id": "513fee67-51dd-4290-8b34-9bce73ee7acc",
+            "actions": [
+                {
+                    "name": "Zoom",
+                    "type": "Value",
+                    "id": "aa61a5f7-4795-46e9-acce-071a89c4aee0",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "0a5b0052-1dc4-4061-99be-360b2e3e4182",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "efd08e26-93e0-4372-b65c-64530e668dd6",
+                    "path": "<Gamepad>/leftStick/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
     "controlSchemes": [
         {
             "name": "Keyboard&Mouse",
