@@ -34,7 +34,26 @@ namespace Graph
 
         private readonly Dictionary<float2, Transform> points = new Dictionary<float2, Transform>();
 
-        private void Awake()
+        private void OnValidate()
+        {
+            if (Application.isPlaying)
+            {
+                Clear();
+                Init();
+            }
+        }
+
+        private void Update()
+        {
+            var position = functions[function];
+
+            foreach (var (uv, point) in points)
+            {
+                point.transform.localPosition = (float3)position(uv, Time.time);
+            }
+        }
+
+        private void Init()
         {
             var uvMap = Map.Linear((0, resolution), positionsInterval);
             var scale = new float3(2) / resolution;
@@ -56,14 +75,13 @@ namespace Graph
             }
         }
 
-        private void Update()
+        private void Clear()
         {
-            var position = functions[function];
-
-            foreach (var (uv, point) in points)
+            foreach (var (_, point) in points)
             {
-                point.transform.localPosition = (float3)position(uv, Time.time);
+                Destroy(point.gameObject);
             }
+            points.Clear();
         }
     }
 }
