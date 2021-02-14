@@ -39,5 +39,21 @@ namespace Graph
         {
             return (interval.Min, interval.Max);
         }
+
+        public float Clamp(float value)
+        {
+            if (value.CompareTo(Min) < 0)
+            {
+                return Min;
+            }
+            else if (value.CompareTo(Max) > 0)
+            {
+                return Max;
+            }
+            else
+            {
+                return value;
+            }
+        }
     }
 }
