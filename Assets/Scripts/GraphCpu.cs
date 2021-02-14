@@ -34,6 +34,8 @@ namespace Graph
 
         private readonly Dictionary<float2, Transform> points = new Dictionary<float2, Transform>();
 
+        private Pool<Transform> pool;
+
         private void OnValidate()
         {
             if (Application.isPlaying)
@@ -55,6 +57,11 @@ namespace Graph
 
         private void Init()
         {
+            if (pool == null)
+            {
+                pool = new Pool<Transform>(pointPrefab);
+            }
+
             var uvMap = Map.Linear((0, resolution), positionsInterval);
             var scale = new float3(2) / resolution;
 
@@ -62,15 +69,16 @@ namespace Graph
             {
                 for (int j = 0; j <= resolution; j++)
                 {
-                    var point = Instantiate(pointPrefab);
+                    var point = pool.Get();
+                    point.gameObject.SetActive(true);
+
                     var uv = new float2(uvMap[i], uvMap[j]);
-
-                    points.Add(uv, point);
-
                     point.name = $"({uv.x:N2}, {uv.y:N2})";
 
                     point.SetParent(transform, worldPositionStays: false);
                     point.transform.localScale = scale;
+
+                    points.Add(uv, point);
                 }
             }
         }
@@ -79,7 +87,8 @@ namespace Graph
         {
             foreach (var (_, point) in points)
             {
-                Destroy(point.gameObject);
+                point.gameObject.SetActive(false);
+                pool.Return(point);
             }
             points.Clear();
         }
