@@ -36,26 +36,17 @@ namespace Graph
 
         private Pool<Transform> pool;
 
-        private void OnValidate()
+        private void OnDisable()
         {
-            if (Application.isPlaying)
+            foreach (var (_, point) in points)
             {
-                Clear();
-                Init();
+                point.gameObject.SetActive(false);
+                pool.Return(point);
             }
+            points.Clear();
         }
 
-        private void Update()
-        {
-            var position = functions[function];
-
-            foreach (var (uv, point) in points)
-            {
-                point.transform.localPosition = (float3)position(uv, Time.time);
-            }
-        }
-
-        private void Init()
+        private void OnEnable()
         {
             if (pool == null)
             {
@@ -83,14 +74,23 @@ namespace Graph
             }
         }
 
-        private void Clear()
+        private void OnValidate()
         {
-            foreach (var (_, point) in points)
+            if (Application.isPlaying)
             {
-                point.gameObject.SetActive(false);
-                pool.Return(point);
+                OnDisable();
+                OnEnable();
             }
-            points.Clear();
+        }
+
+        private void Update()
+        {
+            var position = functions[function];
+
+            foreach (var (uv, point) in points)
+            {
+                point.transform.localPosition = (float3)position(uv, Time.time);
+            }
         }
     }
 }
