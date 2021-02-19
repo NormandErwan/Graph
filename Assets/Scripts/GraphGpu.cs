@@ -21,14 +21,20 @@ namespace Graph
         [SerializeField]
         private Material debugMaterial = default;
 
-        private static readonly int
-            intervalMaxId = Shader.PropertyToID("IntervalMax"),
-            intervalMinId = Shader.PropertyToID("IntervalMin");
+        private static readonly int intervalMaxId = Shader.PropertyToID("IntervalMax");
+        private static readonly int intervalMinId = Shader.PropertyToID("IntervalMin");
+        private static readonly int textureId = Shader.PropertyToID("Texture");
 
         private int3 graphKernelGroups;
         private ComputeBuffer positionsBuffer;
         private ComputeKernel positionsKernel;
         private RenderTexture debugTexture;
+
+        private void OnDisable()
+        {
+            positionsBuffer.Release();
+            debugTexture.Release();
+        }
 
         private void OnEnable()
         {
@@ -49,10 +55,13 @@ namespace Graph
             debugMaterial.mainTexture = debugTexture;
         }
 
-        private void OnDisable()
+        private void OnValidate()
         {
-            positionsBuffer.Release();
-            debugTexture.Release();
+            if (Application.isPlaying)
+            {
+                OnDisable();
+                OnEnable();
+            }
         }
 
         private void Update()
