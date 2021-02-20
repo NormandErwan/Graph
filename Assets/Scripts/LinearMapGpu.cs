@@ -14,5 +14,10 @@ namespace Graph
         public float DomainMin { get; }
 
         public float ImageMin { get; }
+
+        public static implicit operator LinearMapGpu(Map map)
+        {
+            return new LinearMapGpu(map);
+        }
     }
 }
