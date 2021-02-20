@@ -32,13 +32,21 @@ namespace Graph
 
         private void OnDisable()
         {
-            debugTexture.Release();
-            positionsBuffer.Release();
-            uvMapBuffer.Release();
+            if (debugTexture != null)
+            {
+                debugTexture.Release();
+                positionsBuffer.Release();
+                uvMapBuffer.Release();
+            }
         }
 
         private void OnEnable()
         {
+            if (enabled)
+            {
+                OnDisable();
+            }
+
             int sizeofPosition = 3 * sizeof(float);
             positionsBuffer = new ComputeBuffer(resolution * resolution, sizeofPosition);
 
@@ -64,7 +72,6 @@ namespace Graph
         {
             if (Application.isPlaying)
             {
-                OnDisable();
                 OnEnable();
             }
         }
