@@ -48,6 +48,11 @@ namespace Graph
 
         private void OnEnable()
         {
+            if (enabled)
+            {
+                OnDisable();
+            }
+
             if (pool == null)
             {
                 pool = new Pool<Transform>(pointPrefab);
@@ -78,7 +83,6 @@ namespace Graph
         {
             if (Application.isPlaying)
             {
-                OnDisable();
                 OnEnable();
             }
         }
