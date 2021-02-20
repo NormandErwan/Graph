@@ -1,4 +1,5 @@
-﻿using Unity.Mathematics;
+﻿using System.Runtime.InteropServices;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Graph
@@ -21,19 +22,19 @@ namespace Graph
         [SerializeField]
         private Material debugMaterial = default;
 
-        private static readonly int intervalMaxId = Shader.PropertyToID("IntervalMax");
-        private static readonly int intervalMinId = Shader.PropertyToID("IntervalMin");
-        private static readonly int textureId = Shader.PropertyToID("Texture");
+        private static readonly int uvMapId = Shader.PropertyToID("UvMap");
 
+        private RenderTexture debugTexture;
         private int3 graphKernelGroups;
         private ComputeBuffer positionsBuffer;
         private ComputeKernel positionsKernel;
-        private RenderTexture debugTexture;
+        private ComputeBuffer uvMapBuffer;
 
         private void OnDisable()
         {
-            positionsBuffer.Release();
             debugTexture.Release();
+            positionsBuffer.Release();
+            uvMapBuffer.Release();
         }
 
         private void OnEnable()
@@ -53,6 +54,10 @@ namespace Graph
             debugTexture.Create();
             positionsKernel.SetTexture("Texture", debugTexture);
             debugMaterial.mainTexture = debugTexture;
+
+            var uvMap = Map.Linear((0, resolution), positionsInterval);
+            uvMapBuffer = new ComputeBuffer(count: 1, stride: Marshal.SizeOf<LinearMapGpu>());
+            uvMapBuffer.SetData(new LinearMapGpu[] { uvMap });
         }
 
         private void OnValidate()
@@ -66,9 +71,7 @@ namespace Graph
 
         private void Update()
         {
-            graphShader.SetFloat(intervalMinId, positionsInterval.Min);
-            graphShader.SetFloat(intervalMaxId, positionsInterval.Max);
-
+            graphShader.SetBuffer(positionsKernel.Id, uvMapId, uvMapBuffer);
             positionsKernel.Dispatch(graphKernelGroups);
         }
     }
